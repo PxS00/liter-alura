@@ -13,7 +13,7 @@ public class Book {
     private Long id;
     @Column(unique = true)
     private String title;
-    @OneToMany(mappedBy = "books", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Author> author = new ArrayList<>();
     private String language;
     private Integer downloads;
@@ -23,7 +23,7 @@ public class Book {
         this.author = bookData.author().stream()
                 .map(Author::new)
                 .toList();
-        this.author.forEach(a -> a.setBooks(this));
+        this.author.forEach(a -> a.setBook(this));
         this.language = bookData.language().isEmpty() ? "Unknown" : bookData.language().get(0);
         this.downloads = bookData.downloads();
     }
@@ -44,7 +44,7 @@ public class Book {
     }
 
     public void setAuthor(List<Author> author) {
-        author.forEach(a -> a.setBooks(this));
+        author.forEach(a -> a.setBook(this));
         this.author = author;
     }
 

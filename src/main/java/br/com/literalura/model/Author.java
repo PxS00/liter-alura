@@ -12,7 +12,7 @@ public class Author {
     private Integer birthYear;
     private Integer deathYear;
     @ManyToOne
-    private Book books;
+    private Book book;
 
     public Author(AuthorData authorData) {
         this.name = authorData.name();
@@ -47,11 +47,11 @@ public class Author {
         this.deathYear = deathYear;
     }
 
-    public Book getBooks() {
-        return books;
+    public Book getBook() {
+        return book;
     }
 
-    public void setBooks(Book books) {
-        this.books = books;
+    public void setBook(Book book) {
+        this.book = book;
     }
 }
