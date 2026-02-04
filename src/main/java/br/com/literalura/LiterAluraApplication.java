@@ -6,16 +6,16 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class LiteraluraApplication implements CommandLineRunner {
+public class LiterAluraApplication implements CommandLineRunner {
 
     private final Main main;
 
-    public LiteraluraApplication(Main main) {
+    public LiterAluraApplication(Main main) {
         this.main = main;
     }
 
     public static void main(String[] args) {
-        SpringApplication.run(LiteraluraApplication.class, args);
+        SpringApplication.run(LiterAluraApplication.class, args);
     }
 
     @Override

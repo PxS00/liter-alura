@@ -70,26 +70,28 @@ public class Main {
     }
 
     private void searchBookWeb() {
-        ApiResponseData responseData = getBookData();
+        System.out.println("Enter the book name to search:");
+        var bookTitle = sc.nextLine();
+
+        if (bookRepository.findByTitleIgnoreCase(bookTitle).isPresent()) {
+            System.out.println("Book already exists in the database.");
+            return;
+        }
+
+            ApiResponseData responseData = getBookData(bookTitle);
         if (responseData.results().isEmpty()) {
             System.out.println("No book found with the given title.");
             return;
         }
         BookData data = responseData.results().get(0);
         Book book = new Book(data);
-        if (bookRepository.findByTitleContainingIgnoreCase(book.getTitle()).isPresent()) {
-            System.out.println("Book already exists in the database: " + book);
-        } else {
-            bookRepository.save(book);
-            System.out.println("Book saved: " + book);
-        }
+        bookRepository.save(book);
+        System.out.println("Book saved: " + book);
     }
 
-    private ApiResponseData getBookData() {
-        System.out.println("Enter the book title:");
-        var bookTitle = sc.nextLine();
+    private ApiResponseData getBookData(String title) {
         var json = apiClient.getData(
-                ADDRESS + bookTitle.replace(" ", "%20")
+                ADDRESS + title.replace(" ", "%20")
         );
         return jsonParser.parse(json, ApiResponseData.class);
     }
@@ -98,7 +100,8 @@ public class Main {
         storedBooks();
         System.out.println("Enter the book name to search for its author:");
         var bookTitle = sc.nextLine();
-        var bookOpt = bookRepository.findByTitleContainingIgnoreCase(bookTitle);
+        var bookOpt = bookRepository.findByTitleIgnoreCase(bookTitle);
+
         if (bookOpt.isPresent()) {
             Book book = bookOpt.get();
             System.out.println("Authors of the book '" + book.getTitle() + "':");
