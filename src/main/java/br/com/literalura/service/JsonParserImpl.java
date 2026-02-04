@@ -2,7 +2,9 @@ package br.com.literalura.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.stereotype.Component;
 
+@Component
 public class JsonParserImpl implements JsonParser {
     private final ObjectMapper mapper = new ObjectMapper();
 
