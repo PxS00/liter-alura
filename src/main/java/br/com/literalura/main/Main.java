@@ -1,12 +1,16 @@
 package br.com.literalura.main;
 
 import br.com.literalura.model.ApiResponseData;
+import br.com.literalura.model.Author;
 import br.com.literalura.model.Book;
 import br.com.literalura.model.BookData;
 import br.com.literalura.repository.BookRepository;
 import br.com.literalura.service.ApiClient;
 import br.com.literalura.service.JsonParserImpl;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -15,6 +19,8 @@ public class Main {
     private final JsonParserImpl jsonParser = new JsonParserImpl();
     private final BookRepository bookRepository;
     private final String ADDRESS = "https://gutendex.com/books/?search=";
+    private List<Book> books = new ArrayList<>();
+    private List<Author> authors = new ArrayList<>();
 
     public Main(BookRepository bookRepository) {
         this.bookRepository = bookRepository;
@@ -26,6 +32,9 @@ public class Main {
             var menu = """
                      \s
                      1 - Search book
+                     2 - Search author
+                     3 - List stored books
+                     4 - List of living authors as of a given year.
                     \s
                      0 - Exit                                \s
                     \s""";
@@ -37,6 +46,15 @@ public class Main {
             switch (op) {
                 case 1:
                     searchBookWeb();
+                    break;
+                case 2:
+                    searchAuthor();
+                    break;
+                case 3:
+                    storedBooks();
+                    break;
+                case 4:
+                    authorsfromYear();
                     break;
                 case 0:
                     System.out.println("Exiting...");
@@ -55,8 +73,12 @@ public class Main {
         }
         BookData data = responseData.results().get(0);
         Book book = new Book(data);
-        bookRepository.save(book);
-        System.out.println("Book saved: " + book);
+        if (bookRepository.findByTitleContainingIgnoreCase(book.getTitle()).isPresent()) {
+            System.out.println("Book already exists in the database: " + book);
+        } else {
+            bookRepository.save(book);
+            System.out.println("Book saved: " + book);
+        }
     }
 
     private ApiResponseData getBookData() {
@@ -68,4 +90,38 @@ public class Main {
         return jsonParser.parse(json, ApiResponseData.class);
     }
 
+    private void searchAuthor() {
+        storedBooks();
+        System.out.println("Enter the book name to search for its author:");
+        var bookTitle = sc.nextLine();
+        var bookOpt = bookRepository.findByTitleContainingIgnoreCase(bookTitle);
+        if (bookOpt.isPresent()) {
+            Book book = bookOpt.get();
+            System.out.println("Authors of the book '" + book.getTitle() + "':");
+            book.getAuthor().forEach(System.out::println);
+        } else {
+            System.out.println("No book found with the given title.");
+        }
+    }
+
+    private void storedBooks() {
+        books = bookRepository.findAll();
+        books.stream()
+                .sorted(Comparator.comparing(Book::getId))
+                .forEach(b -> System.out.println(b.getTitle()));
+    }
+
+    private void authorsfromYear() {
+        System.out.println("Enter the year to find living authors as of that year:");
+        var year = sc.nextInt();
+        sc.nextLine();
+        authors = bookRepository.authorsByLivingYear(year);
+        if (authors.isEmpty()) {
+            System.out.println("No authors found who were alive in the year " + year + ".");
+        } else {
+            System.out.println("Authors who were alive in the year " + year + ":");
+            authors.forEach(System.out::println);
+        }
+    }
 }
+
