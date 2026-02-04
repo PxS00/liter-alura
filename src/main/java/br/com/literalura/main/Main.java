@@ -1,6 +1,7 @@
 package br.com.literalura.main;
 
 import br.com.literalura.model.ApiResponseData;
+import br.com.literalura.model.Author;
 import br.com.literalura.model.Book;
 import br.com.literalura.model.BookData;
 import br.com.literalura.repository.AuthorRepository;
@@ -30,12 +31,13 @@ public class Main {
         var op = -1;
         while (op != 0) {
             var menu = """
-                     \s
+                        ===== LiterAlura Menu =====
                      1 - Search book
                      2 - Search author
-                     3 - List stored books
-                     4 - List of living authors as of a given year.
-                     5 - List of books in a specific language
+                     3 - Stored books
+                     4 - Stored authors 
+                     5 - List of living authors as of a given year.
+                     6 - List of books in a specific language
                     \s
                      0 - Exit                                \s
                     \s""";
@@ -55,9 +57,12 @@ public class Main {
                     storedBooks();
                     break;
                 case 4:
-                    authorsfromYear();
+                    storedAuthors();
                     break;
                 case 5:
+                    authorsfromYear();
+                    break;
+                case 6:
                     booksByLanguage();
                     break;
                 case 0:
@@ -73,7 +78,7 @@ public class Main {
         System.out.println("Enter the book name to search:");
         var bookTitle = sc.nextLine();
 
-        if (bookRepository.findByTitleIgnoreCase(bookTitle).isPresent()) {
+        if (bookRepository.findByTitleContainingIgnoreCase(bookTitle).isPresent()) {
             System.out.println("Book already exists in the database.");
             return;
         }
@@ -86,7 +91,7 @@ public class Main {
         BookData data = responseData.results().get(0);
         Book book = new Book(data);
         bookRepository.save(book);
-        System.out.println("Book saved: " + book);
+        System.out.println(book);
     }
 
     private ApiResponseData getBookData(String title) {
@@ -98,9 +103,9 @@ public class Main {
 
     private void searchAuthor() {
         storedBooks();
-        System.out.println("Enter the book name to search for its author:");
+        System.out.println("\nEnter the book name to search for its author:");
         var bookTitle = sc.nextLine();
-        var bookOpt = bookRepository.findByTitleIgnoreCase(bookTitle);
+        var bookOpt = bookRepository.findByTitleContainingIgnoreCase(bookTitle);
 
         if (bookOpt.isPresent()) {
             Book book = bookOpt.get();
@@ -113,9 +118,18 @@ public class Main {
 
     private void storedBooks() {
         var books = bookRepository.findAll();
+        System.out.println("\nStored books in the database:\n");
         books.stream()
                 .sorted(Comparator.comparing(Book::getId))
-                .forEach(b -> System.out.println(b.getTitle()));
+                .forEach(b -> System.out.println("Book: " + b.getTitle()));
+    }
+
+    private void storedAuthors() {
+        var authors = authorRepository.findAll();
+        System.out.println("\nStored authors in the database:\n");
+        authors.stream()
+                .sorted(Comparator.comparing(Author::getId))
+                .forEach(System.out::println);
     }
 
     private void authorsfromYear() {

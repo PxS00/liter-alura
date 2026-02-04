@@ -70,20 +70,20 @@ public class Book {
     @Override
     public String toString() {
         return """
-            ----- LIVRO -----
-            Título: %s
-            Autor: %s
-            Idioma: %s
-            Número de downloads: %d
+            ----- BOOK -----
+            Title: %s
+            Author: %s
+            Language: %s
+            Downloads: %d
             -----------------
             """.formatted(
                 title,
                 author.isEmpty()
-                        ? "Desconhecido"
+                        ? "Unknown"
                         : author.stream()
                         .map(Author::getName)
                         .findFirst()
-                        .orElse("Desconhecido"),
+                        .orElse("Unknown"),
                 language,
                 downloads
         );
