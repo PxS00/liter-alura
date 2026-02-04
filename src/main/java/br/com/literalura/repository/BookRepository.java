@@ -11,6 +11,5 @@ import java.util.Optional;
 public interface BookRepository extends JpaRepository<Book, Long> {
     Optional<Book> findByTitleContainingIgnoreCase(String bookTitle);
 
-    @Query("SELECT a FROM Author a WHERE a.birthYear <= :year AND (a.deathYear IS NULL OR a.deathYear >= :year)")
-    List<Author> authorsByLivingYear(Integer year);
+    List<Book> findByLanguageContainingIgnoreCase(String language);
 }

@@ -4,6 +4,7 @@ import br.com.literalura.model.ApiResponseData;
 import br.com.literalura.model.Author;
 import br.com.literalura.model.Book;
 import br.com.literalura.model.BookData;
+import br.com.literalura.repository.AuthorRepository;
 import br.com.literalura.repository.BookRepository;
 import br.com.literalura.service.ApiClient;
 import br.com.literalura.service.JsonParserImpl;
@@ -18,12 +19,12 @@ public class Main {
     private final ApiClient apiClient = new ApiClient();
     private final JsonParserImpl jsonParser = new JsonParserImpl();
     private final BookRepository bookRepository;
-    private final String ADDRESS = "https://gutendex.com/books/?search=";
-    private List<Book> books = new ArrayList<>();
-    private List<Author> authors = new ArrayList<>();
+    private final AuthorRepository authorRepository;
+    private final String ADDRESS = "https://gutendex.com/books?search=";
 
-    public Main(BookRepository bookRepository) {
+    public Main(BookRepository bookRepository, AuthorRepository authorRepository) {
         this.bookRepository = bookRepository;
+        this.authorRepository = authorRepository;
     }
 
     public void showMenu() {
@@ -35,6 +36,7 @@ public class Main {
                      2 - Search author
                      3 - List stored books
                      4 - List of living authors as of a given year.
+                     5 - List of books in a specific language
                     \s
                      0 - Exit                                \s
                     \s""";
@@ -55,6 +57,9 @@ public class Main {
                     break;
                 case 4:
                     authorsfromYear();
+                    break;
+                case 5:
+                    booksByLanguage();
                     break;
                 case 0:
                     System.out.println("Exiting...");
@@ -105,7 +110,7 @@ public class Main {
     }
 
     private void storedBooks() {
-        books = bookRepository.findAll();
+        var books = bookRepository.findAll();
         books.stream()
                 .sorted(Comparator.comparing(Book::getId))
                 .forEach(b -> System.out.println(b.getTitle()));
@@ -115,12 +120,24 @@ public class Main {
         System.out.println("Enter the year to find living authors as of that year:");
         var year = sc.nextInt();
         sc.nextLine();
-        authors = bookRepository.authorsByLivingYear(year);
+        var authors = authorRepository.authorsByLivingYear(year);
         if (authors.isEmpty()) {
             System.out.println("No authors found who were alive in the year " + year + ".");
         } else {
             System.out.println("Authors who were alive in the year " + year + ":");
             authors.forEach(System.out::println);
+        }
+    }
+
+    private void booksByLanguage() {
+        System.out.println("Enter the language to find books:");
+        var language = sc.nextLine();
+        var books = bookRepository.findByLanguageContainingIgnoreCase(language);
+        if (books.isEmpty()) {
+            System.out.println("No books found in the language: " + language + ".");
+        } else {
+            System.out.println("Books in the language '" + language + "':");
+            books.forEach(b -> System.out.println(b.getTitle()));
         }
     }
 }
