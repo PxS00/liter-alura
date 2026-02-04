@@ -1,29 +1,39 @@
 package br.com.literalura.model;
 
 import jakarta.persistence.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "books")
 public class Book {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(unique = true)
+
     private String title;
-    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {
+            CascadeType.PERSIST,
+            CascadeType.MERGE
+    })
+    @JoinTable(
+            name = "books_authors",
+            joinColumns = @JoinColumn(name = "book_id"),
+            inverseJoinColumns = @JoinColumn(name = "author_id")
+    )
     private List<Author> author = new ArrayList<>();
+
     private String language;
     private Integer downloads;
 
     public Book(BookData bookData) {
         this.title = bookData.title();
-        this.author = bookData.author().stream()
+        this.author = bookData.author()
+                .stream()
                 .map(Author::new)
                 .toList();
-        this.author.forEach(a -> a.setBook(this));
         this.language = bookData.language().isEmpty() ? "Unknown" : bookData.language().get(0);
         this.downloads = bookData.downloads();
     }
@@ -47,7 +57,6 @@ public class Book {
     }
 
     public void setAuthor(List<Author> author) {
-        author.forEach(a -> a.setBook(this));
         this.author = author;
     }
 

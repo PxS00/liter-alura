@@ -1,9 +1,15 @@
 package br.com.literalura.model;
 
 import jakarta.persistence.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
-@Table(name = "authors")
+@Table(name = "authors",
+        uniqueConstraints = @UniqueConstraint(
+                columnNames = {"name", "birthYear", "deathYear"}
+        )
+)
 public class Author {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -11,8 +17,8 @@ public class Author {
     private String name;
     private Integer birthYear;
     private Integer deathYear;
-    @ManyToOne
-    private Book book;
+    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "author", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    private List<Book> book;
 
     public Author(AuthorData authorData) {
         this.name = authorData.name();
@@ -51,28 +57,35 @@ public class Author {
         this.deathYear = deathYear;
     }
 
-    public Book getBook() {
+    public List<Book> getBook() {
         return book;
     }
 
-    public void setBook(Book book) {
+    public void setBook(List<Book> book) {
         this.book = book;
     }
 
     @Override
     public String toString() {
+
+        String booksTitles = book == null || book.isEmpty()
+                ? "No books"
+                : book.stream()
+                .map(Book::getTitle)
+                .collect(Collectors.joining(", "));
+
         return """
-                ----- AUTHOR -----
-                Name: %s
-                Birth Year: %s
-                Death Year: %s
-                Books: %s
-                -----------------
-                """.formatted(
+            ----- AUTHOR -----
+            Name: %s
+            Birth Year: %s
+            Death Year: %s
+            Books: %s
+            -----------------
+            """.formatted(
                 name,
                 birthYear != null ? birthYear : "Unknown",
                 deathYear != null ? deathYear : "Alive",
-                book != null ? book.getTitle() : "No books"
+                booksTitles
         );
     }
 }
