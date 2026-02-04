@@ -14,10 +14,7 @@ public class Book {
 
     private String title;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = {
-            CascadeType.PERSIST,
-            CascadeType.MERGE
-    })
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "books_authors",
             joinColumns = @JoinColumn(name = "book_id"),
@@ -30,11 +27,9 @@ public class Book {
 
     public Book(BookData bookData) {
         this.title = bookData.title();
-        this.author = bookData.author()
-                .stream()
-                .map(Author::new)
-                .toList();
-        this.language = bookData.language().isEmpty() ? "Unknown" : bookData.language().get(0);
+        this.language = bookData.language().isEmpty()
+                ? "Unknown"
+                : bookData.language().get(0);
         this.downloads = bookData.downloads();
     }
 

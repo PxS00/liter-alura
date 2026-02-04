@@ -1,23 +1,24 @@
 package br.com.literalura.service;
 
-import br.com.literalura.model.ApiResponseData;
-import br.com.literalura.model.Book;
-import br.com.literalura.model.BookData;
+import br.com.literalura.model.*;
+import br.com.literalura.repository.AuthorRepository;
 import br.com.literalura.repository.BookRepository;
 import org.springframework.stereotype.Service;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class BookService {
     private final BookRepository bookRepository;
+    private final AuthorRepository authorRepository;
     private final ApiClient apiClient;
     private final JsonParserImpl jsonParser;
     private final String ADDRESS = "https://gutendex.com/books?search=";
 
-    public BookService(BookRepository bookRepository, ApiClient apiClient, JsonParserImpl jsonParser) {
+    public BookService(BookRepository bookRepository, AuthorRepository authorRepository, ApiClient apiClient, JsonParserImpl jsonParser) {
         this.bookRepository = bookRepository;
+        this.authorRepository = authorRepository;
         this.apiClient = apiClient;
         this.jsonParser = jsonParser;
     }
@@ -37,6 +38,12 @@ public class BookService {
             return;
         }
         Book book = new Book(data);
+        List<Author> authors = data.author()
+                .stream()
+                .map(this::getOrCreateAuthor)
+                .collect(Collectors.toList());
+
+        book.setAuthor(authors);
         bookRepository.save(book);
         System.out.println("Book saved successfully.");
         System.out.println(book);
@@ -83,5 +90,16 @@ public class BookService {
         bookRepository
                 .findByLanguageContainingIgnoreCase(language)
                 .forEach(System.out::println);
+    }
+
+    private Author getOrCreateAuthor(AuthorData data) {
+
+        return authorRepository
+                .findByNameIgnoreCaseAndBirthYearAndDeathYear(
+                        data.name(),
+                        data.birthYear(),
+                        data.deathYear()
+                )
+                .orElseGet(() -> authorRepository.save(new Author(data)));
     }
 }

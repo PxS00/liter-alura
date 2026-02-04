@@ -17,7 +17,7 @@ public class Author {
     private String name;
     private Integer birthYear;
     private Integer deathYear;
-    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "author", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "author")
     private List<Book> book;
 
     public Author(AuthorData authorData) {
