@@ -63,4 +63,14 @@ public class Book {
     public void setDownloads(Integer downloads) {
         this.downloads = downloads;
     }
+
+    @Override
+    public String toString() {
+        return "Book: " +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", author=" + author +
+                ", language='" + language + '\'' +
+                ", downloads=" + downloads;
+    }
 }
