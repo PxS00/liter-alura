@@ -1,18 +1,8 @@
 package br.com.literalura.main;
 
-import br.com.literalura.model.ApiResponseData;
-import br.com.literalura.model.Author;
-import br.com.literalura.model.Book;
-import br.com.literalura.model.BookData;
-import br.com.literalura.repository.AuthorRepository;
-import br.com.literalura.repository.BookRepository;
-import br.com.literalura.service.ApiClient;
 import br.com.literalura.service.AuthorService;
 import br.com.literalura.service.BookService;
-import br.com.literalura.service.JsonParserImpl;
 import org.springframework.stereotype.Component;
-
-import java.util.Comparator;
 import java.util.Scanner;
 
 @Component
