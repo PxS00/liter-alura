@@ -83,7 +83,7 @@ public class Main {
             return;
         }
 
-            ApiResponseData responseData = getBookData(bookTitle);
+        ApiResponseData responseData = getBookData(bookTitle);
         if (responseData.results().isEmpty()) {
             System.out.println("No book found with the given title.");
             return;
@@ -146,14 +146,25 @@ public class Main {
     }
 
     private void booksByLanguage() {
-        System.out.println("Enter the language to find books:");
-        var language = sc.nextLine();
+        System.out.println("""
+            Enter a language to perform the search:
+            es - Spanish
+            en - English
+            fr - French
+            pt - Portuguese
+            """);
+
+        var language = sc.nextLine().trim();
         var books = bookRepository.findByLanguageContainingIgnoreCase(language);
+
         if (books.isEmpty()) {
-            System.out.println("No books found in the language: " + language + ".");
+            System.out.println("No books found in the language: " + language);
         } else {
             System.out.println("Books in the language '" + language + "':");
-            books.forEach(b -> System.out.println(b.getTitle()));
+
+            books.stream()
+                    .sorted(Comparator.comparing(Book::getTitle))
+                    .forEach(System.out::println);
         }
     }
 }
