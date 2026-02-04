@@ -69,11 +69,23 @@ public class Book {
 
     @Override
     public String toString() {
-        return "Book: " +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                ", author=" + author +
-                ", language='" + language + '\'' +
-                ", downloads=" + downloads;
+        return """
+            ----- LIVRO -----
+            Título: %s
+            Autor: %s
+            Idioma: %s
+            Número de downloads: %d
+            -----------------
+            """.formatted(
+                title,
+                author.isEmpty()
+                        ? "Desconhecido"
+                        : author.stream()
+                        .map(Author::getName)
+                        .findFirst()
+                        .orElse("Desconhecido"),
+                language,
+                downloads
+        );
     }
 }
