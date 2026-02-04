@@ -22,5 +22,5 @@ public interface BookRepository extends JpaRepository<Book, Long> {
 
     List<Book> findByLanguageContainingIgnoreCase(String language);
 
-    Optional<Book> findByTitleContainingIgnoreCase(String title);
+    List<Book> findByTitleContainingIgnoreCase(String title);
 }

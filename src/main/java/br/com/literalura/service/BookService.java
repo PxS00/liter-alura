@@ -6,6 +6,7 @@ import br.com.literalura.model.BookData;
 import br.com.literalura.repository.BookRepository;
 import org.springframework.stereotype.Service;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -35,7 +36,10 @@ public class BookService {
             System.out.println("Book already exists.");
             return;
         }
-        bookRepository.save(new Book(data));
+        Book book = new Book(data);
+        bookRepository.save(book);
+        System.out.println("Book saved successfully.");
+        System.out.println(book);
     }
 
     private ApiResponseData fetchBookFromApi(String title) {
@@ -66,7 +70,7 @@ public class BookService {
                 .isPresent();
     }
 
-    public Optional<Book> findBookByTitle(String title) {
+    public List<Book> findBookByTitle(String title) {
         return bookRepository.findByTitleContainingIgnoreCase(title);
     }
 

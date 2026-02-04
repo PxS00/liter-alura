@@ -82,10 +82,11 @@ public class Main {
     }
 
     private void searchAuthor() {
+        storedBooks();
         System.out.println("Enter the book name to find its author:");
         var title = sc.nextLine();
 
-        authorService.searchAuthorByBook(title);
+        authorService.searchAuthorByBook(title, sc);
     }
 
     private void storedBooks() {
